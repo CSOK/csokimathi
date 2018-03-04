@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <body><br /><br />
+        <div class="container col-md-4 col-md-offset-4" style="border: 0.1px solid #06C0C0; padding: 20px;">
+            {# Load the tag library #}
+            {% load bootstrap3 %}
+
+            {# Load CSS and JavaScript #}
+            {% bootstrap_css %}
+            {% bootstrap_javascript %}
+
+            {# Display django.contrib.messages as Bootstrap alerts #}
+            {% bootstrap_messages %}
+
+            {# Display a form #}
+            {% if form.errors %}
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <div class="alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <form action="" method="post" class="form">
+                <h1 style="text-align: center; font-family: 'SIMPSON';">Register new account</h1><br />
+                {% csrf_token %}
+                {% bootstrap_form user_form layout='inline' %}
+                {% buttons %}
+                    <button class="btn btn-primary" style="width:100%; background: rgba(0, 0, 10, 25);">
+                        {% bootstrap_icon "star" %} Sign up
+                    </button><br /><br />
+                    <p>You have an account<a class="btn btn-link" href="{% url 'index:login' %}" style="color: #256B6B;">login here</a></p>
+                {% endbuttons %}
+            </form>
+        </div>
+    </body>
+{% endblock %}
