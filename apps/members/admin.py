@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from .models import Profile, Post, Comment, Account, Member
+from .models import Profile, Comment, Account, Member, Snippet
 from django.contrib import admin
 from django.db import models as django_models
 from pagedown.widgets import AdminPagedownWidget
@@ -11,22 +11,15 @@ class ProfileAdmin(admin.ModelAdmin):
 		model = Profile
 
 
-class PostAdmin(admin.ModelAdmin):
+class SnippetAdmin(admin.ModelAdmin):
     # Note: this makes pagedown the default editor for ALL text fields
-    formfield_overrides = {
-        django_models.TextField: {'widget': AdminPagedownWidget },
-    }
+    list_display = ('title', 'code', 'linenos', 'language', 'style', 'highlighted', 'comment_count')
     prepopulated_fields = {'slug': ('title',)}
-    list_display = ('title', 'post_date', 'posted_by',
-                    'comment_count', 'allow_comments')
     readonly_fields = ('comment_count',)
 
 
 class CommentAdmin(admin.ModelAdmin):
     # Note: this makes pagedown the default editor for ALL text fields
-    formfield_overrides = {
-        django_models.TextField: {'widget': AdminPagedownWidget},
-    }
     list_display = ('user_name', 'user_email', 'ip_address', 'post_date')
 
 
@@ -47,6 +40,7 @@ class MemberAdmin(admin.ModelAdmin):
             'first_name',
             'last_name',
             'date_of_birth',
+            'regno',
             'academic_year',
             'course',
             'gender',
@@ -56,7 +50,7 @@ class MemberAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Profile, ProfileAdmin)
-admin.site.register(Post, PostAdmin)
+admin.site.register(Snippet, SnippetAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Member, MemberAdmin)
