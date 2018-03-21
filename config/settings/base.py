@@ -104,13 +104,15 @@ INSTALLED_APPS = [
     'django.contrib.redirects',
     'rest_framework',
     'rest_framework_swagger',
+    'schedule',
+    'djangobower',
     'markdown_deux',
     'bootstrap3',
     'taggit',
     'el_pagination',
     'crispy_forms',
     'apps.members',
-    'apps.mainsite',
+    'apps.billing',
 ]
 
 SITE_ID = 1
@@ -180,7 +182,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    )
+}
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -202,18 +212,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'config/media')
 STATIC_URL = '/static/'
 
-LOGIN_URL = '/mainsite/'
-LOGIN_REDIRECT_URL = '/index/'
+LOGIN_URL = '/api-auth/login'
+LOGIN_REDIRECT_URL = '/api-auth/'
 
 LOGIN_EXEMPT_URLS = (
-    r'^index/logout/$',
-    r'^index/signup/$',
-    r'^index/login/$',
-    r'^mainsite/$',
-    r'^index/reset-password/$',
-    r'^index/reset-password/done/$',
-    r'^index/reset-password/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
-    r'^index/reset-password/complete/$'
+    r'^api-auth/logout/$',
+    r'^api-auth/login/$',
 )
 
 

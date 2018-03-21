@@ -95,6 +95,7 @@ class UserMemberForm(forms.ModelForm):
             'first_name',
             'last_name',
             'date_of_birth',
+            'regno',
             'academic_year',
             'course',
             'gender',

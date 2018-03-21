@@ -7,10 +7,18 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from pygments.lexers import get_all_lexers, get_lexer_by_name
+from pygments import highlight
+from pygments.styles import get_all_styles
 from django.db.models.signals import post_save
+from pygments.formatters.html import HtmlFormatter
 from django.urls import reverse
-from .signals import save_comment
+from apps.members.signals import save_comment
 from django.core.exceptions import ValidationError
+
+LEXERS = [item for item in get_all_lexers() if item[1]]
+LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])
+STYLE_CHOICES = sorted((item, item) for item in get_all_styles())
 
 GENDER_CHOICES = [
     ('M', 'Male'),
@@ -49,59 +57,6 @@ class PublishedManager(models.Manager):
         return super(PublishedManager, self).get_queryset().filter(status='Published')
 
 
-@python_2_unicode_compatible
-class Post(models.Model):
-    tags = TaggableManager()
-    title = models.CharField(max_length=200, verbose_name=_("title"))
-    slug = models.SlugField()
-    bodytext = models.TextField(blank=True, verbose_name=_("message"))
-    post_date = models.DateTimeField(auto_now_add=True, verbose_name=_("post date"))
-    modified = models.DateTimeField(null=True, verbose_name=_("modified"))
-    posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("posted by"),on_delete=models.CASCADE, default=True)
-    allow_comments = models.BooleanField(default=True, verbose_name=_("allow comments"))
-    comment_count = models.IntegerField(blank=True, default=0, verbose_name=_('comment count'))
-
-    class Meta:
-        verbose_name = _('post')
-        verbose_name_plural = _('posts')
-        ordering = ['-post_date']
-
-    def __str__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        kwargs = {
-            'slug': self.slug,
-            'year': '%04d' % self.post_date.year,
-            'month': '%02d' % self.post_date.month,
-            'day': '%02d' % self.post_date.day,
-        }
-
-        return reverse('index:post_detail', kwargs=kwargs)
-
-
-class Comment(models.Model):
-    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE, verbose_name=_("post"))
-    bodytext = models.TextField(verbose_name=_("message"))
-    post_date = models.DateTimeField(auto_now_add=True, verbose_name=_("post date"))
-    ip_address = models.GenericIPAddressField(default='0.0.0.0', verbose_name=_("ip address"))
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, verbose_name=_("user"), 
-        on_delete=models.CASCADE, related_name='comment_user')
-    user_name = models.CharField(max_length=50, default='anonymous', verbose_name=_("user name"))
-    user_email = models.EmailField(blank=True, verbose_name=_("user email"))
-
-    def __str__(self):
-        return self.bodytext
-
-    class Meta:
-        verbose_name = _('comment')
-        verbose_name_plural = _('comments')
-        ordering = ['post_date']
-
-
-post_save.connect(save_comment, sender=Comment)
-
-
 class Member(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE, related_name='member_user')
     first_name = models.CharField(max_length=100)
@@ -109,6 +64,7 @@ class Member(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     academic_year = models.IntegerField(null=True, blank=True)
     course = models.CharField(max_length=100)
+    regno = models.CharField(max_length=100, null=True, blank=True)
     gender = models.CharField(max_length=1, default='Gender', choices=GENDER_CHOICES)
     date_of_registration = models.DateField(auto_now_add=True)
     date_of_expiry = models.DateField(blank=True, null=True)
@@ -141,3 +97,57 @@ class Account(models.Model):
 
     def get_absolute_url(self):
         return reverse('index:account_detail', kwargs = {'slug': self.slug}) 
+
+
+class Snippet(models.Model):
+    owner = models.ForeignKey('auth.User', related_name='snippets', blank=True, null=True, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=100, blank=True, default='')
+    slug = models.SlugField()
+    code = models.TextField()
+    linenos = models.BooleanField(default=False)
+    language = models.CharField(choices=LANGUAGE_CHOICES, default='Python', max_length=100)
+    style = models.CharField(choices=STYLE_CHOICES, default='Friendly', max_length=100)
+    allow_comments = models.BooleanField(default=True, verbose_name=_("allow comments"))
+    comment_count = models.IntegerField(blank=True, default=0, verbose_name=_('comment count'))
+    highlighted = models.TextField()
+
+    class Meta:
+        ordering = ('created',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        """
+        Use the `pygments` library to create a highlighted HTML
+        representation of the code snippet.
+        """
+        lexer = get_lexer_by_name(self.language)
+        linenos = self.linenos and 'table' or False
+        options = self.title and {'title': self.title} or {}
+        formatter = HtmlFormatter(style=self.style, linenos=linenos, full=True, **options)
+        self.highlighted = highlight(self.code, lexer, formatter)
+        super(Snippet, self).save(*args, **kwargs)
+
+
+class Comment(models.Model):
+    snippet = models.ForeignKey(Snippet, related_name='comments',null=True, blank=True, on_delete=models.CASCADE, verbose_name=_("snippet"))
+    bodytext = models.TextField(verbose_name=_("message"))
+    post_date = models.DateTimeField(auto_now_add=True, verbose_name=_("post date"))
+    ip_address = models.GenericIPAddressField(default='0.0.0.0', verbose_name=_("ip address"))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, verbose_name=_("user"), 
+        on_delete=models.CASCADE, related_name='comment_user')
+    user_name = models.CharField(max_length=50, default='anonymous', verbose_name=_("user name"))
+    user_email = models.EmailField(blank=True, verbose_name=_("user email"))
+
+    def __str__(self):
+        return self.bodytext
+
+    class Meta:
+        verbose_name = _('comment')
+        verbose_name_plural = _('comments')
+        ordering = ['post_date']
+
+
+post_save.connect(save_comment, sender=Comment)

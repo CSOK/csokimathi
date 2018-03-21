@@ -2,4 +2,4 @@ from django.shortcuts import redirect
 
 
 def login_redirect(request):
-    return redirect('/index/login')
+    return redirect('/api-auth/login')
