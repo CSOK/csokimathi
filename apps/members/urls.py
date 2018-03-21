@@ -12,6 +12,11 @@ router.register(r'accounts', views.AccountViewSet)
 router.register(r'members', views.MemberViewSet)
 router.register(r'snippets', views.SnippetViewSet)
 router.register(r'comments', views.CommentViewSet)
+router.register(r'calendars', views.CalendarViewSet)
+router.register(r'Calendar_relations', views.CalendarRelationViewSet)
+router.register(r'events', views.EventViewSet)
+router.register(r'occurrences', views.OccurrenceViewSet)
+router.register(r'rules', views.RuleViewSet)
 
 
 urlpatterns = [

@@ -104,6 +104,8 @@ INSTALLED_APPS = [
     'django.contrib.redirects',
     'rest_framework',
     'rest_framework_swagger',
+    'schedule',
+    'djangobower',
     'markdown_deux',
     'bootstrap3',
     'taggit',

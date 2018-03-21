@@ -1,5 +1,9 @@
 from django.shortcuts import render, redirect
 from apps.members.models import Profile, Comment, Account, Member, Snippet
+
+from schedule.models.events import Event, Occurrence
+from schedule.models.calendars import Calendar, CalendarRelation
+from schedule.models.rules import Rule
 from django.forms.models import inlineformset_factory
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -14,7 +18,12 @@ from apps.members.serializers import (
     ImageSerializer,
     AccountSerializer,
     CommentSerializer,
-    MemberSerializer
+    MemberSerializer,
+    EventSerializer,
+    CalendarSerializer,
+    RuleSerializer,
+    OccurrenceSerializer,
+    CalendarRelationSerializer
 )
 from django.contrib.syndication.views import Feed
 from rest_framework.decorators import api_view, detail_route
@@ -23,6 +32,27 @@ from rest_framework.reverse import reverse
 from rest_framework import renderers, permissions, viewsets, status
 from apps.members.permissions import IsOwnerOrReadOnly
 
+
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    
+
+class OccurrenceViewSet(viewsets.ModelViewSet):
+    queryset = Occurrence.objects.all()
+    serializer_class = OccurrenceSerializer
+
+class CalendarViewSet(viewsets.ModelViewSet):
+    queryset = Calendar.objects.all()
+    serializer_class = CalendarSerializer
+
+class CalendarRelationViewSet(viewsets.ModelViewSet):
+    queryset = CalendarRelation.objects.all()
+    serializer_class = CalendarRelationSerializer
+
+class RuleViewSet(viewsets.ModelViewSet):
+    queryset = Rule.objects.all()
+    serializer_class = RuleSerializer
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer

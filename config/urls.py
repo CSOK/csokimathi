@@ -13,8 +13,9 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^$', csok_views.login_redirect, name='login_redirect'),
+    url(r'^schema/$', schema_view),
     url(r'^admin/', admin.site.urls),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^$', schema_view),
     url(r'^api-auth/', include('apps.members.urls')),
+    url(r'^api-auth/', include('schedule.urls')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

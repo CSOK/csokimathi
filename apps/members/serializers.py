@@ -1,4 +1,7 @@
 from django.contrib.auth.models import User, Group
+from schedule.models.events import Event, Occurrence
+from schedule.models.calendars import Calendar, CalendarRelation
+from schedule.models.rules import Rule
 from rest_framework import serializers
 from apps.members.models import (
     Snippet, 
@@ -11,6 +14,65 @@ from apps.members.models import (
 )
 
 
+class EventSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Event
+        fields = (
+            'url', 
+            'id', 
+            'start', 
+            'end', 
+            'title', 
+            'description', 
+            'creator', 
+            'rule', 
+            'end_recurring_period', 
+            'calendar', 
+            'color_event'
+        )
+
+
+class OccurrenceSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Occurrence
+        fields = (
+            'url',
+            'id',
+            'event',
+            'title',
+            'description',
+            'start',
+            'end',
+            'cancelled',
+            'original_start',
+            'original_end',
+            'created_on',
+            'updated_on'
+        )
+
+class CalendarSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Calendar
+        fields = ('url', 'id', 'name')
+
+
+class CalendarRelationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = CalendarRelation
+        fields = (
+            'url',
+            'id',
+            'calendar',
+            'content_object',
+            'object_id',
+            'distinction',
+            'inheritable'
+        )
+
+class RuleSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Rule
+        fields = ('url', 'id', 'name', 'description', 'frequency', 'params', '_week_days')
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
     class Meta:
@@ -71,7 +133,19 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 class MemberSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Member
-        fields = ('url', 'id', 'user', 'first_name', 'last_name', 'date_of_birth', 'academic_year', 'course', 'regno', 'gender', 'date_of_registration')
+        fields = (
+            'url', 
+            'id', 
+            'user', 
+            'first_name', 
+            'last_name', 
+            'date_of_birth', 
+            'academic_year', 
+            'course', 
+            'regno', 
+            'gender', 
+            'date_of_registration'
+        )
 
     def create(self, validated_data):
         member = super(MemberSerializer, self).create(validated_data)
