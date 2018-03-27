@@ -8,7 +8,6 @@ from rest_framework.schemas import get_schema_view
 
 schema_view = get_schema_view(title='CSoKimathi API')
 app_name = "csokimathi"
-
 admin.autodiscover()
 
 urlpatterns = [
@@ -17,5 +16,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include('apps.members.urls')),
     url(r'^api-auth/', include('schedule.urls')),
+    url(r'^api-auth/', include('mpesa_api.core.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

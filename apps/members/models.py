@@ -14,6 +14,8 @@ from django.db.models.signals import post_save
 from pygments.formatters.html import HtmlFormatter
 from django.urls import reverse
 from apps.members.signals import save_comment
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 
 LEXERS = [item for item in get_all_lexers() if item[1]]
@@ -28,6 +30,7 @@ GENDER_CHOICES = [
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='profile_pic', blank=True, null=True)
+    tags = GenericRelation(ContentType)
     description = models.TextField(max_length=500, default='', null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     phone = models.IntegerField(default=0, null=True)
@@ -61,6 +64,7 @@ class Member(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE, related_name='member_user')
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    tags = GenericRelation(ContentType)
     date_of_birth = models.DateField(null=True, blank=True)
     academic_year = models.IntegerField(null=True, blank=True)
     course = models.CharField(max_length=100)
@@ -68,7 +72,6 @@ class Member(models.Model):
     gender = models.CharField(max_length=1, default='Gender', choices=GENDER_CHOICES)
     date_of_registration = models.DateField(auto_now_add=True)
     date_of_expiry = models.DateField(blank=True, null=True)
-    
 
     def __str__(self):
         return self.user.get_full_name()
@@ -83,6 +86,7 @@ class Account(models.Model):
     location = models.CharField(max_length=50)
     address = models.CharField(max_length=50)
     account_leader = models.ForeignKey(Member, related_name='account_leader', on_delete=models.CASCADE)
+    tags = GenericRelation(ContentType)
     slug = models.SlugField()
     created_date = models.DateField(auto_now_add=True)
     allow_members = models.BooleanField(default=True)
@@ -96,7 +100,7 @@ class Account(models.Model):
         verbose_name_plural = _('accounts')
 
     def get_absolute_url(self):
-        return reverse('index:account_detail', kwargs = {'slug': self.slug}) 
+        return reverse('index:account_detail', kwargs = {'slug': self.slug})
 
 
 class Snippet(models.Model):
@@ -104,6 +108,7 @@ class Snippet(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100, blank=True, default='')
     slug = models.SlugField()
+    tags = GenericRelation(ContentType)
     code = models.TextField()
     linenos = models.BooleanField(default=False)
     language = models.CharField(choices=LANGUAGE_CHOICES, default='Python', max_length=100)
@@ -134,9 +139,10 @@ class Snippet(models.Model):
 class Comment(models.Model):
     snippet = models.ForeignKey(Snippet, related_name='comments',null=True, blank=True, on_delete=models.CASCADE, verbose_name=_("snippet"))
     bodytext = models.TextField(verbose_name=_("message"))
+    tags = GenericRelation(ContentType)
     post_date = models.DateTimeField(auto_now_add=True, verbose_name=_("post date"))
     ip_address = models.GenericIPAddressField(default='0.0.0.0', verbose_name=_("ip address"))
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, verbose_name=_("user"), 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, verbose_name=_("user"),
         on_delete=models.CASCADE, related_name='comment_user')
     user_name = models.CharField(max_length=50, default='anonymous', verbose_name=_("user name"))
     user_email = models.EmailField(blank=True, verbose_name=_("user email"))
@@ -148,6 +154,5 @@ class Comment(models.Model):
         verbose_name = _('comment')
         verbose_name_plural = _('comments')
         ordering = ['post_date']
-
 
 post_save.connect(save_comment, sender=Comment)

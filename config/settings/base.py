@@ -25,7 +25,7 @@ SECRET_KEY = 'b&v2i#-17_fhh@ihv%7)$rf$2yc+-oz9ro*_pl=2v*&qt@pp^t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.43.30', '10.42.0.1', 'localhost']
 
 BOOTSTRAP3 = {
 
@@ -104,6 +104,10 @@ INSTALLED_APPS = [
     'django.contrib.redirects',
     'rest_framework',
     'rest_framework_swagger',
+    'django_extensions',
+    'mpesa_api.core',
+    'mpesa_api.util',
+    'rangefilter',
     'schedule',
     'djangobower',
     'markdown_deux',
@@ -134,6 +138,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -224,3 +229,35 @@ LOGIN_EXEMPT_URLS = (
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
+
+MPESA_B2C_ACCESS_KEY = 'Mpesa b2c access Key'
+MPESA_B2C_CONSUMER_SECRET = 'Mpesa b2c consumer secret'
+MPESA_C2B_ACCESS_KEY = 'Mpesa c2b access Key'
+MPESA_C2B_CONSUMER_SECRET = 'Mpesa c2b consumer secret'
+B2C_SECURITY_TOKEN = 'b2c security token'
+B2C_INITIATOR_NAME = 'b2c initiator name'
+B2C_COMMAND_ID = 'Sb2c command id'
+B2C_SHORTCODE = 'b2c shortcode'
+B2C_QUEUE_TIMEOUT_URL = 'b2c queue timeout url'
+B2C_RESULT_URL = 'b2c result url'
+
+C2B_REGISTER_URL = 'c2b register url'
+C2B_VALIDATE_URL = 'c2b validate url'
+C2B_CONFIRMATION_URL = 'c2b confirmation url'
+C2B_SHORT_CODE = 'c2b short code'
+C2B_RESPONSE_TYPE = 'Completed'
+
+C2B_ONLINE_CHECKOUT_URL = 'c2b online checkout url'
+C2B_ONLINE_CHECKOUT_CALLBACK_URL = 'online checkout callback url'
+C2B_TRANSACTION_TYPE = 'CustomerPayBillOnline'
+C2B_ONLINE_PASSKEY = 'c2b online passkey'
+C2B_ONLINE_SHORT_CODE = 'c2b online short code'
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
+
+# Urls
+GENERATE_TOKEN_URL = 'auth url'
+B2C_URL = 'b2c url'
+
+# number of seconds from the expiry we consider the token expired 
+# the token expires after an hour 
+TOKEN_THRESHOLD = 600
