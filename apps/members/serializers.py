@@ -1,16 +1,15 @@
 from django.contrib.auth.models import User, Group
-
 from django.contrib.contenttypes.models import ContentType
 from schedule.models.events import Event, Occurrence
 from schedule.models.calendars import Calendar, CalendarRelation
 from schedule.models.rules import Rule
 from rest_framework import serializers
 from apps.members.models import (
-    Snippet, 
-    LANGUAGE_CHOICES, 
-    STYLE_CHOICES, 
-    Profile, 
-    Comment, 
+    Snippet,
+    LANGUAGE_CHOICES,
+    STYLE_CHOICES,
+    Profile,
+    Comment,
     Account,
     Member
 )
@@ -20,16 +19,16 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Event
         fields = (
-            'url', 
-            'id', 
-            'start', 
-            'end', 
-            'title', 
-            'description', 
-            'creator', 
-            'rule', 
-            'end_recurring_period', 
-            'calendar', 
+            'url',
+            'id',
+            'start',
+            'end',
+            'title',
+            'description',
+            'creator',
+            'rule',
+            'end_recurring_period',
+            'calendar',
             'color_event'
         )
 
@@ -57,7 +56,6 @@ class CalendarSerializer(serializers.HyperlinkedModelSerializer):
         model = Calendar
         fields = ('url', 'id', 'name')
 
-
 class CalendarRelationObjectRelatedField(serializers.RelatedField):
     def to_representation(self, value):
         if isinstance(value, User):
@@ -74,6 +72,7 @@ class CalendarRelationObjectRelatedField(serializers.RelatedField):
 
 class CalendarRelationSerializer(serializers.HyperlinkedModelSerializer):
     content_type = CalendarRelationObjectRelatedField(queryset=ContentType.objects.all())
+
     class Meta:
         model = CalendarRelation
         fields = (
@@ -91,6 +90,7 @@ class RuleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Rule
         fields = ('url', 'id', 'name', 'description', 'frequency', 'params')
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
     class Meta:
@@ -141,7 +141,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Comment
         fields = ('url', 'id', 'snippet', 'bodytext')
-    
+
     def create(self, validated_data):
         comment = super(CommentSerializer, self).create(validated_data)
         comment.save()
@@ -152,16 +152,16 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Member
         fields = (
-            'url', 
-            'id', 
-            'user', 
-            'first_name', 
-            'last_name', 
-            'date_of_birth', 
-            'academic_year', 
-            'course', 
-            'regno', 
-            'gender', 
+            'url',
+            'id',
+            'user',
+            'first_name',
+            'last_name',
+            'date_of_birth',
+            'academic_year',
+            'course',
+            'regno',
+            'gender',
             'date_of_registration'
         )
 
@@ -170,12 +170,3 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
         member.save()
         return member
 
-'''
-class PasswordSerializer(serializers.HyperlinkedModelSerializer):
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = ('url', 'old_password', 'new_password')
-'''

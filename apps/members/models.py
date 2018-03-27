@@ -72,7 +72,6 @@ class Member(models.Model):
     gender = models.CharField(max_length=1, default='Gender', choices=GENDER_CHOICES)
     date_of_registration = models.DateField(auto_now_add=True)
     date_of_expiry = models.DateField(blank=True, null=True)
-    
 
     def __str__(self):
         return self.user.get_full_name()
@@ -101,7 +100,7 @@ class Account(models.Model):
         verbose_name_plural = _('accounts')
 
     def get_absolute_url(self):
-        return reverse('index:account_detail', kwargs = {'slug': self.slug}) 
+        return reverse('index:account_detail', kwargs = {'slug': self.slug})
 
 
 class Snippet(models.Model):
@@ -143,7 +142,7 @@ class Comment(models.Model):
     tags = GenericRelation(ContentType)
     post_date = models.DateTimeField(auto_now_add=True, verbose_name=_("post date"))
     ip_address = models.GenericIPAddressField(default='0.0.0.0', verbose_name=_("ip address"))
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, verbose_name=_("user"), 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, verbose_name=_("user"),
         on_delete=models.CASCADE, related_name='comment_user')
     user_name = models.CharField(max_length=50, default='anonymous', verbose_name=_("user name"))
     user_email = models.EmailField(blank=True, verbose_name=_("user email"))
@@ -155,6 +154,5 @@ class Comment(models.Model):
         verbose_name = _('comment')
         verbose_name_plural = _('comments')
         ordering = ['post_date']
-
 
 post_save.connect(save_comment, sender=Comment)
