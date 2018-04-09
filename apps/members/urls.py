@@ -18,11 +18,6 @@ router.register(r'events', views.EventViewSet)
 router.register(r'occurrences', views.OccurrenceViewSet)
 router.register(r'rules', views.RuleViewSet)
 
-
 urlpatterns = [
     url(r'^', include(router.urls))
-<<<<<<< HEAD
 ]
-=======
-]
->>>>>>> d8270f11bacd8449e1c3b99f2e3f25413a3d488d
