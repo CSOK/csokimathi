@@ -139,7 +139,6 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -163,7 +162,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'csok',
         'USER': 'root',
-        'PASSWORD': '@mermaid1234',
+        'PASSWORD': '@bashtech1234',
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -258,6 +257,6 @@ CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
 GENERATE_TOKEN_URL = 'auth url'
 B2C_URL = 'b2c url'
 
-# number of seconds from the expiry we consider the token expired 
-# the token expires after an hour 
+# number of seconds from the expiry we consider the token expired
+# the token expires after an hour
 TOKEN_THRESHOLD = 600
